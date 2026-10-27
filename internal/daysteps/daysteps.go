@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Yandex-Practicum/tracker/spentcalories"
+	"github.com/Yandex-Practicum/tracker/internal/spentcalories"
 )
 
 const (
@@ -42,23 +42,21 @@ func parsePackage(data string) (int, time.Duration, error) {
 	return steps, duration, nil
 }
 
-func DayActionInfo(data string, weight, height float64) (string, error) {
+func DayActionInfo(data string, weight, height float64) string {
 	// TODO: реализовать функцию
 	steps, duration, err := parsePackage(data)
 	if err != nil {
-		return "", err
-	}
-
-	if weight == 0 || height == 0 {
-		return "", errors.New("Вес или рост быть больше 0")
+		return ""
 	}
 
 	distance := float64(steps) * stepLength
 	kilometers := distance / mInKm
-	calories := spentcalories.WalkingSpentCalories(steps, weight, height, duration)
+	calories, err := spentcalories.WalkingSpentCalories(steps, weight, height, duration)
+	if err != nil {
+		return ""
+	}
 
 	return fmt.Sprintf(`Количество шагов: %d.
 	Дистанция составила %.2f км.
-	Вы сожгли %.2f ккал.`, steps, kilometers, calories), nil
-
+	Вы сожгли %.2f ккал.`, steps, kilometers, calories)
 }
